@@ -1,5 +1,10 @@
 package belajar
 
+import (
+	"fmt"
+	"sort"
+)
+
 // Student merepresentasikan data seorang siswa.
 type Student struct {
 	Name  string
@@ -11,7 +16,7 @@ type Student struct {
 // Contoh: NewStudent("Andi", 17, 85.5) -> Student{Name: "Andi", Age: 17, Grade: 85.5}
 func NewStudent(name string, age int, grade float64) Student {
 	// TODO: implementasi di sini
-	return Student{}
+	return Student{Name: name, Age: age, Grade: grade}
 }
 
 // IsPass mengecek apakah siswa lulus (Grade >= 70.0).
@@ -21,6 +26,9 @@ func NewStudent(name string, age int, grade float64) Student {
 //	Student{Grade: 70}.IsPass() -> true (batas tepat = lulus)
 func (s Student) IsPass() bool {
 	// TODO: implementasi di sini
+	if s.Grade >= 70 {
+		return true
+	}
 	return false
 }
 
@@ -33,7 +41,7 @@ func (s Student) IsPass() bool {
 func (s Student) Info() string {
 	// TODO: implementasi di sini
 	// Hint: gunakan fmt.Sprintf
-	return ""
+	return fmt.Sprintf("%s (%d tahun) - Nilai: %.2f", s.Name, s.Age, s.Grade)
 }
 
 // AverageGrade menghitung rata-rata Grade dari slice Student.
@@ -43,7 +51,15 @@ func (s Student) Info() string {
 //	AverageGrade([]Student{}) -> 0
 func AverageGrade(students []Student) float64 {
 	// TODO: implementasi di sini
-	return 0
+	if len(students) == 0 {
+		return 0
+	}
+	var val float64
+	for _, v := range students {
+		val += v.Grade
+	}
+
+	return float64((val / float64(len(students))))
 }
 
 // TopStudent mengembalikan Student dengan Grade tertinggi.
@@ -54,7 +70,19 @@ func AverageGrade(students []Student) float64 {
 //	TopStudent([]Student{}) -> Student{}, true
 func TopStudent(students []Student) (Student, bool) {
 	// TODO: implementasi di sini
-	return Student{}, true
+	if len(students) == 0 {
+		return Student{}, true
+	}
+
+	var val Student
+
+	for _, v := range students {
+		if v.Grade > val.Grade {
+			val = v
+		}
+	}
+
+	return val, false
 }
 
 // FilterByMinGrade mengembalikan slice Student yang Grade-nya >= minGrade.
@@ -63,7 +91,19 @@ func TopStudent(students []Student) (Student, bool) {
 //	FilterByMinGrade([]Student{}, 70) -> []Student{}
 func FilterByMinGrade(students []Student, minGrade float64) []Student {
 	// TODO: implementasi di sini
-	return nil
+
+	var val []Student
+	if len(students) == 0 {
+		return val
+	}
+
+	for _, v := range students {
+		if v.Grade >= minGrade {
+			val = append(val, v)
+		}
+	}
+
+	return val
 }
 
 // SortByGrade mengurutkan slice Student berdasarkan Grade secara descending (tertinggi dulu).
@@ -75,7 +115,15 @@ func FilterByMinGrade(students []Student, minGrade float64) []Student {
 func SortByGrade(students []Student) []Student {
 	// TODO: implementasi di sini
 	// Hint: gunakan sort.SliceStable
-	return nil
+
+	val := make([]Student, len(students))
+	copy(val, students)
+
+	sort.SliceStable(val, func(i, j int) bool {
+		return val[i].Grade > val[j].Grade
+	})
+
+	return val
 }
 
 // CountByPassFail menghitung jumlah siswa yang lulus dan tidak lulus (Grade >= 70 = lulus).
@@ -85,7 +133,21 @@ func SortByGrade(students []Student) []Student {
 //	CountByPassFail([]Student{}) -> 0, 0
 func CountByPassFail(students []Student) (int, int) {
 	// TODO: implementasi di sini
-	return 0, 0
+	if len(students) == 0 {
+		return 0, 0
+	}
+	var countPass int
+	var countFail int
+
+	for _, v := range students {
+		if v.Grade >= 70 {
+			countPass++
+		} else {
+			countFail++
+		}
+	}
+
+	return countPass, countFail
 }
 
 // UniqueNames mengembalikan daftar nama unik dari slice Student.
@@ -95,7 +157,18 @@ func CountByPassFail(students []Student) (int, int) {
 //	UniqueNames([]Student{}) -> []string{}
 func UniqueNames(students []Student) []string {
 	// TODO: implementasi di sini
-	return nil
+
+	val := make(map[string]bool)
+	var value []string
+
+	for _, v := range students {
+		if !(val[v.Name]) {
+			val[v.Name] = true
+			value = append(value, v.Name)
+		}
+	}
+
+	return value
 }
 
 // NamesByGradeRange mengembalikan nama-nama siswa yang Grade-nya berada di antara min dan max (inklusif).
@@ -104,5 +177,13 @@ func UniqueNames(students []Student) []string {
 //	NamesByGradeRange([]Student{{Name: "A", Grade: 70}}, 70, 70) -> []string{"A"}
 func NamesByGradeRange(students []Student, min, max float64) []string {
 	// TODO: implementasi di sini
-	return nil
+
+	var val []string
+
+	for _, v := range students {
+		if v.Grade >= min && v.Grade <= max {
+			val = append(val, v.Name)
+		}
+	}
+	return val
 }

@@ -1,6 +1,12 @@
 package belajar
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"math"
+	"strconv"
+	"strings"
+)
 
 // Custom error variables - gunakan untuk perbandingan error di test.
 var (
@@ -20,7 +26,10 @@ var (
 //	SafeDivide(10, 0) -> 0, ErrDivisionByZero
 func SafeDivide(a, b float64) (float64, error) {
 	// TODO: implementasi di sini
-	return 0, nil
+	if b == 0 {
+		return 0, ErrDivisionByZero
+	}
+	return a / b, nil
 }
 
 // SafeSqrt mengembalikan akar kuadrat dari n.
@@ -32,7 +41,11 @@ func SafeDivide(a, b float64) (float64, error) {
 // Hint: gunakan math.Sqrt
 func SafeSqrt(n float64) (float64, error) {
 	// TODO: implementasi di sini
-	return 0, nil
+
+	if n < 0 {
+		return 0, ErrNegativeNumber
+	}
+	return math.Sqrt(n), nil
 }
 
 // SafeIndex mengembalikan elemen pada index dari slice.
@@ -43,7 +56,10 @@ func SafeSqrt(n float64) (float64, error) {
 //	SafeIndex([]int{10, 20, 30}, -1) -> 0, ErrOutOfRange
 func SafeIndex(nums []int, index int) (int, error) {
 	// TODO: implementasi di sini
-	return 0, nil
+	if len(nums)-1 < index || index < 0 {
+		return 0, ErrOutOfRange
+	}
+	return nums[index], nil
 }
 
 // ParsePositiveInt mengonversi string ke integer positif.
@@ -57,7 +73,14 @@ func SafeIndex(nums []int, index int) (int, error) {
 // Hint: gunakan strconv.Atoi
 func ParsePositiveInt(s string) (int, error) {
 	// TODO: implementasi di sini
-	return 0, nil
+	if _, err := strconv.Atoi(s); err != nil {
+		return 0, ErrInvalidInput
+	}
+	if v, _ := strconv.Atoi(s); int(v) < 0 {
+		return 0, ErrNegativeNumber
+	}
+	v, _ := strconv.Atoi(s)
+	return v, nil
 }
 
 // ParseAge menerima string dan mengembalikan usia (int).
@@ -72,7 +95,16 @@ func ParsePositiveInt(s string) (int, error) {
 func ParseAge(s string) (int, error) {
 	// TODO: implementasi di sini
 	// Hint: gunakan strconv.Atoi
-	return 0, nil
+	v, err := strconv.Atoi(s)
+
+	if err != nil {
+		return 0, ErrInvalidInput
+	}
+	if v < 0 || v > 150 {
+		return 0, ErrOutOfBounds
+	}
+
+	return v, nil
 }
 
 // ValidateEmail melakukan validasi sederhana format email.
@@ -91,6 +123,32 @@ func ParseAge(s string) (int, error) {
 func ValidateEmail(email string) error {
 	// TODO: implementasi di sini
 	// Hint: gunakan strings.Count, strings.Index, strings.LastIndex
+
+	type data struct {
+		indexAt  int
+		countAt  int
+		IndexDot int
+	}
+
+	var val data
+
+	for k, v := range email {
+		if string(v) == "@" {
+			val.indexAt = k
+			val.countAt++
+		} else if string(v) == "." && k != len(email)-1 {
+			val.IndexDot = k
+		}
+	}
+	fmt.Println(val)
+
+	if val.indexAt == 0 || val.IndexDot == 0 || val.countAt > 1 {
+		return ErrInvalidFormat
+	}
+	if val.indexAt > val.IndexDot {
+		return ErrInvalidFormat
+	}
+
 	return nil
 }
 
@@ -101,7 +159,14 @@ func ValidateEmail(email string) error {
 //	SafeAverage([]float64{}) -> 0, ErrEmptySlice
 func SafeAverage(nums []float64) (float64, error) {
 	// TODO: implementasi di sini
-	return 0, nil
+	if len(nums) == 0 {
+		return 0, ErrEmptySlice
+	}
+	var val float64
+	for _, v := range nums {
+		val += v
+	}
+	return val / float64(len(nums)), nil
 }
 
 // MinMax mengembalikan nilai minimum dan maksimum dari slice int.
@@ -111,7 +176,22 @@ func SafeAverage(nums []float64) (float64, error) {
 //	MinMax([]int{}) -> 0, 0, ErrEmptySlice
 func MinMax(nums []int) (int, int, error) {
 	// TODO: implementasi di sini
-	return 0, 0, nil
+	if len(nums) == 0 {
+		return 0, 0, ErrEmptySlice
+	}
+
+	max := math.Inf(-1)
+	min := math.Inf(1)
+
+	for _, v := range nums {
+		if float64(v) > max {
+			max = float64(v)
+		}
+		if float64(v) < min {
+			min = float64(v)
+		}
+	}
+	return int(min), int(max), nil
 }
 
 // ParseHexColor mengurai string hex color "#RRGGBB" menjadi tiga komponen (r, g, b).
@@ -126,6 +206,20 @@ func MinMax(nums []int) (int, int, error) {
 // Hint: gunakan strconv.ParseInt dengan base 16
 func ParseHexColor(hex string) (int, int, int, error) {
 	// TODO: implementasi di sini
+	val := strings.Index(hex, "#")
+	if val == -1 {
+		return 0, 0, 0, ErrInvalidFormat
+	}
+	if val == 0 && len(hex) == 7 {
+		var r int64
+		var g int64
+		var b int64
+		r, _ = strconv.ParseInt(string(hex[1])+string(hex[2]), 16, 64)
+		g, _ = strconv.ParseInt(string(hex[3])+string(hex[4]), 16, 64)
+		b, _ = strconv.ParseInt(string(hex[5])+string(hex[6]), 16, 64)
+
+		return int(r), int(g), int(b), nil
+	}
 	return 0, 0, 0, nil
 }
 
@@ -145,5 +239,38 @@ func ParseHexColor(hex string) (int, int, int, error) {
 //	Retry(fn, 1) -> error (gagal, hanya 1 percobaan)
 func Retry(fn func() error, maxAttempts int) error {
 	// TODO: implementasi di sini
-	return nil
+	if maxAttempts <= 0 {
+		return ErrInvalidInput
+	}
+	var lastError error
+	for i := 0; i < maxAttempts; i++ {
+		result := fn()
+		if result == nil {
+			return nil
+		} else {
+			lastError = result
+		}
+	}
+	return lastError
 }
+
+// FUNCTION Retry(fn, maxAttempts):
+
+//     IF maxAttempts <= 0 THEN
+//         RETURN ErrInvalidInput
+//     ENDIF
+
+//     lastError ← nil
+
+//     FOR i FROM 1 TO maxAttempts DO
+//         result ← fn()
+
+//         IF result == nil THEN
+//             RETURN nil   // sukses
+//         ELSE
+//             lastError ← result
+//         ENDIF
+//     ENDFOR
+
+//     RETURN lastError   // semua percobaan gagal
+// END FUNCTION
