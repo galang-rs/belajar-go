@@ -1,5 +1,11 @@
 package belajar
 
+import (
+	"math"
+	"strconv"
+	"strings"
+)
+
 // IsAnagram mengecek apakah dua string merupakan anagram (case-insensitive).
 // Anagram = memiliki huruf yang sama dengan jumlah yang sama (spasi diabaikan).
 // Contoh: IsAnagram("listen", "silent") -> true
@@ -11,7 +17,38 @@ package belajar
 // Hint: gunakan strings.ToLower, abaikan spasi
 func IsAnagram(s1, s2 string) bool {
 	// TODO: implementasi di sini
-	return false
+	val1 := strings.ToLower(strings.Replace(s1, " ", "", len(s1)))
+	val2 := strings.ToLower(strings.Replace(s2, " ", "", len(s2)))
+
+	if len(val1) != len(val2) {
+		return false
+	}
+	if val1 == val2 {
+		return true
+	}
+
+	data1 := make(map[rune]int)
+	data2 := make(map[rune]int)
+
+	for _, v := range val1 {
+		data1[v]++
+	}
+	for _, v := range val2 {
+		data2[v]++
+	}
+
+	for k := range data1 {
+		if data1[k] != data2[k] {
+			return false
+		}
+	}
+	for k := range data2 {
+		if data1[k] != data2[k] {
+			return false
+		}
+	}
+
+	return true
 }
 
 // LongestCommonPrefix mengembalikan prefix (awalan) terpanjang yang sama dari semua string di slice.
@@ -23,7 +60,39 @@ func IsAnagram(s1, s2 string) bool {
 //	LongestCommonPrefix([]string{"alone"}) -> "alone"
 func LongestCommonPrefix(strs []string) string {
 	// TODO: implementasi di sini
-	return ""
+
+	if len(strs) == 0 {
+		return ""
+	}
+	if len(strs) == 1 {
+		return strs[0]
+	}
+
+	var lowLength float64 = math.Inf(1)
+	var indx int
+
+	for k, v1 := range strs {
+		if lowLength >= float64(len(v1)) {
+			lowLength = float64(len(v1))
+			indx = k
+		}
+	}
+
+	var word string
+	for i := 0; i < int(lowLength); i++ {
+		data := strs[indx][i]
+		done := true
+		for _, v := range strs {
+			if data != v[i] {
+				return v[:i]
+			}
+			if done {
+				word = word + string(data)
+				done = false
+			}
+		}
+	}
+	return word
 }
 
 // Compress melakukan Run-Length Encoding pada string.
@@ -35,7 +104,18 @@ func LongestCommonPrefix(strs []string) string {
 //	Compress("") -> ""
 func Compress(s string) string {
 	// TODO: implementasi di sini
-	return ""
+
+	data := make(map[rune]int)
+
+	for _, v := range s {
+		data[v]++
+	}
+	val := ""
+	for k, v := range data {
+		vale := strconv.Itoa(v)
+		val = val + string(k) + vale
+	}
+	return val
 }
 
 // Decompress membalikkan Run-Length Encoding.
@@ -48,7 +128,26 @@ func Compress(s string) string {
 // Hint: gunakan strconv.Atoi untuk parsing angka lebih dari 1 digit
 func Decompress(s string) string {
 	// TODO: implementasi di sini
-	return ""
+
+	word := make(map[rune]string)
+	var lastWord rune
+	for _, v := range s {
+		switch v {
+		case 48, 49, 50, 51, 52, 53, 54, 55, 56, 57:
+			word[lastWord] = string(word[lastWord]) + string(v)
+		default:
+			lastWord = v
+			word[lastWord] = ""
+		}
+	}
+	scope := ""
+	for k, v := range word {
+		val, _ := strconv.Atoi(v)
+		for i := 0; i < val; i++ {
+			scope = scope + string(k)
+		}
+	}
+	return scope
 }
 
 // CaesarEncrypt mengenkripsi string menggunakan Caesar cipher.
@@ -60,8 +159,23 @@ func Decompress(s string) string {
 //	CaesarEncrypt("Hello, World!", 5) -> "Mjqqt, Btwqi!"
 //	CaesarEncrypt("abc", -1) -> "zab"
 func CaesarEncrypt(s string, shift int) string {
-	// TODO: implementasi di sini
-	return ""
+	result := ""
+
+	for _, c := range s {
+		if c >= 'a' && c <= 'z' {
+			offset := int(c - 'a')
+			newPos := ((offset+shift)%26 + 26) % 26
+			result += string(rune(newPos) + 'a')
+		} else if c >= 'A' && c <= 'Z' {
+			offset := int(c - 'A')
+			newPos := ((offset+shift)%26 + 26) % 26
+			result += string(rune(newPos) + 'A')
+		} else {
+			result += string(c)
+		}
+	}
+
+	return result
 }
 
 // CaesarDecrypt mendekripsi string yang dienkripsi Caesar cipher.
@@ -71,8 +185,7 @@ func CaesarEncrypt(s string, shift int) string {
 //
 // Hint: dekripsi = enkripsi dengan shift negatif
 func CaesarDecrypt(s string, shift int) string {
-	// TODO: implementasi di sini
-	return ""
+	return CaesarEncrypt(s, -shift)
 }
 
 // IsValidBrackets mengecek apakah urutan bracket/kurung dalam string valid (balanced).
