@@ -1,6 +1,7 @@
 package belajar
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -200,8 +201,60 @@ func CaesarDecrypt(s string, shift int) string {
 //	IsValidBrackets("hello(world)") -> true
 func IsValidBrackets(s string) bool {
 	// TODO: implementasi di sini
+	var stack []rune
+
+	dispatch := make(map[rune]rune)
+	dispatch[rune('{')] = rune('}')
+	dispatch[rune('[')] = rune(']')
+	dispatch[rune('(')] = rune(')')
+
+	for _, v := range s {
+		if v == rune('(') || v == rune('{') || v == rune('[') {
+			stack = append(stack, v)
+		} else if v == rune('}') || v == rune(']') || v == rune(')') {
+			if len(stack) == 0 {
+				return false
+			}
+			top := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			if v != dispatch[top] {
+				return false
+			}
+
+		}
+	}
+	if len(stack) == 0 {
+		return true
+	}
+
 	return false
 }
+
+// FUNCTION isValidBrackets(s: string) -> boolean
+//     CREATE empty stack
+
+//     FOR setiap karakter c di s:
+//         IF c adalah '(' ATAU '[' ATAU '{' THEN
+//             PUSH c ke stack
+
+//         ELSE IF c adalah ')' ATAU ']' ATAU '}' THEN
+//             IF stack kosong THEN
+//                 RETURN false
+
+//             top = POP dari stack
+
+//             IF (c == ')' DAN top != '(') ATAU
+//                (c == ']' DAN top != '[') ATAU
+//                (c == '}' DAN top != '{') THEN
+//                 RETURN false
+//         ENDIF
+//     ENDFOR
+
+//     IF stack kosong THEN
+//         RETURN true
+//     ELSE
+//         RETURN false
+// END FUNCTION
 
 // CountSubstring menghitung berapa kali substring muncul dalam string (tidak overlap).
 // Case-sensitive.
@@ -215,7 +268,34 @@ func IsValidBrackets(s string) bool {
 // Hint: gunakan strings.Count atau implementasi manual
 func CountSubstring(s, sub string) int {
 	// TODO: implementasi di sini
-	return 0
+	if len(sub) == 0 {
+		return 0
+	}
+
+	type data struct {
+		word  string
+		count int
+	}
+	dataWord := &data{}
+	for _, v := range s {
+		if strings.Contains(sub, string(v)) {
+			dataWord.word = dataWord.word + string(v)
+		}
+		if len(dataWord.word) == len(sub) {
+			fmt.Println(dataWord.word)
+			if dataWord.word == sub {
+				dataWord.count++
+				dataWord.word = ""
+			} else {
+				dataWord.word = ""
+			}
+		}
+		if v == rune(' ') {
+			dataWord.word = ""
+		}
+	}
+	fmt.Println(sub, dataWord)
+	return dataWord.count
 }
 
 // TitleCase mengubah huruf pertama setiap kata menjadi huruf kapital, sisanya huruf kecil.
@@ -228,7 +308,20 @@ func CountSubstring(s, sub string) int {
 func TitleCase(s string) string {
 	// TODO: implementasi di sini
 	// Hint: gunakan strings.Fields dan strings.ToUpper/strings.ToLower
-	return ""
+
+	word := ""
+	for k, v := range strings.ToLower(s) {
+		if k == 0 {
+			word = word + strings.ToUpper(string(v))
+		} else if string(s[k-1]) == " " && string(v) != " " {
+			word = word + strings.ToUpper(string(v))
+		} else if string(s[k-1]) == " " && string(v) == " " {
+		} else {
+			word = word + string(v)
+		}
+	}
+
+	return word
 }
 
 // RemoveDuplicateChars menghapus karakter duplikat, hanya menyisakan kemunculan pertama.
@@ -240,5 +333,14 @@ func TitleCase(s string) string {
 //	RemoveDuplicateChars("") -> ""
 func RemoveDuplicateChars(s string) string {
 	// TODO: implementasi di sini
-	return ""
-}
+
+	var word string
+
+	for _, v := range s {
+		if !strings.Contains(word, string(v)) {
+			word = word + string(v)
+		}
+	}
+
+	return word
+} // < semuanya uniq ternyata latternya
