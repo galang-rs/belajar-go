@@ -1,5 +1,11 @@
 package belajar
 
+import (
+	"fmt"
+	"math"
+	"strconv"
+)
+
 // RomanToInt mengonversi string angka Romawi ke integer.
 // Input dijamin valid dan berada di rentang 1-3999.
 // Simbol Romawi: I=1, V=5, X=10, L=50, C=100, D=500, M=1000
@@ -12,7 +18,163 @@ package belajar
 //	RomanToInt("MCMXCIV") -> 1994
 func RomanToInt(s string) int {
 	// TODO: implementasi di sini
-	return 0
+	var count int
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case 'I':
+			if i+2 < len(s) {
+				if s[i+1] == 'I' && s[i+2] == 'I' {
+					count += 3
+					i += 2
+				} else if s[i+1] == 'I' {
+					count += 2
+					i += 1
+				} else {
+					switch s[i+1] {
+					case 'V':
+						count += 4
+					case 'X':
+						count += 9
+					case 'L':
+						count += 49
+					case 'C':
+						count += 99
+					case 'D':
+						count += 499
+					case 'M':
+						count += 999
+					}
+					i += 1
+				}
+			} else if i+1 < len(s) {
+				if s[i+1] == 'I' {
+					count += 2
+					i += 1
+				} else {
+					switch s[i+1] {
+					case 'V':
+						count += 4
+					case 'X':
+						count += 9
+					case 'L':
+						count += 49
+					case 'C':
+						count += 99
+					case 'D':
+						count += 499
+					case 'M':
+						count += 999
+					}
+					i += 1
+				}
+			} else {
+				count += 1
+			}
+		case 'V':
+			count += 5
+		case 'X':
+			if i+2 < len(s) {
+				if s[i+1] == 'X' && s[i+2] == 'X' {
+					count += 30
+					i += 2
+				} else if s[i+1] == 'X' {
+					count += 20
+					i += 1
+				} else {
+					switch s[i+1] {
+					case 'L':
+						count += 40
+					case 'C':
+						count += 90
+					case 'D':
+						count += 490
+					case 'M':
+						count += 990
+					}
+					i += 1
+				}
+			} else if i+1 < len(s) {
+				if s[i+1] == 'I' {
+					count += 2
+					i += 1
+				} else {
+					switch s[i+1] {
+					case 'L':
+						count += 40
+					case 'C':
+						count += 90
+					case 'D':
+						count += 490
+					case 'M':
+						count += 990
+					}
+					i += 1
+				}
+			} else {
+				count += 10
+			}
+		case 'L':
+			count += 50
+		case 'C':
+			if i+2 < len(s) {
+				if s[i+1] == 'C' && s[i+2] == 'C' {
+					count += 300
+					i += 2
+				} else if s[i+1] == 'C' {
+					count += 200
+					i += 1
+				} else {
+					switch s[i+1] {
+					case 'D':
+						count += 400
+					case 'M':
+						count += 900
+					}
+					i += 1
+				}
+			} else if i+1 < len(s) {
+				if s[i+1] == 'C' {
+					count += 2
+					i += 1
+				} else {
+					switch s[i+1] {
+					case 'D':
+						count += 400
+					case 'M':
+						count += 900
+					}
+					i += 1
+				}
+			} else {
+				count += 100
+			}
+		case 'D':
+			count += 500
+		case 'M':
+			if i+2 < len(s) {
+				if s[i+1] == 'M' && s[i+2] == 'M' {
+					count += 3000
+					i += 2
+				} else if s[i+1] == 'M' {
+					count += 2000
+					i += 1
+				} else {
+					count += 1000
+				}
+			} else if i+1 < len(s) {
+				if s[i+1] == 'M' {
+					count += 2000
+					i += 1
+				} else {
+					count += 2000
+				}
+			} else {
+				count += 1000
+			}
+		}
+
+	}
+	return count
 }
 
 // IntToRoman mengonversi integer (1-3999) ke string angka Romawi.
@@ -25,7 +187,90 @@ func RomanToInt(s string) int {
 //	IntToRoman(3999) -> "MMMCMXCIX"
 func IntToRoman(n int) string {
 	// TODO: implementasi di sini
-	return ""
+	var word string
+	val := strconv.Itoa(n)
+	words := val
+	for i := 0; i < len(words); i++ {
+		if 4 == len(words)-i {
+			switch string(words[i]) {
+			case "3":
+				word = word + "MMM"
+			case "2":
+				word = word + "MM"
+			case "1":
+				word = word + "M"
+			}
+			fmt.Println(word, "Area 1")
+		} else if 3 == len(words)-i {
+			switch string(words[i]) {
+			case "9":
+				word = word + "CM"
+			case "8":
+				word = word + "DCCC"
+			case "7":
+				word = word + "DCC"
+			case "6":
+				word = word + "DC"
+			case "5":
+				word = word + "D"
+			case "4":
+				word = word + "CD"
+			case "3":
+				word = word + "CCC"
+			case "2":
+				word = word + "CC"
+			case "1":
+				word = word + "C"
+			}
+			fmt.Println(word, "Area 2")
+		} else if 2 == len(words)-i {
+			switch string(words[i]) {
+			case "9":
+				word = word + "XC"
+			case "8":
+				word = word + "LXXX"
+			case "7":
+				word = word + "LXX"
+			case "6":
+				word = word + "LX"
+			case "5":
+				word = word + "L"
+			case "4":
+				word = word + "XL"
+			case "3":
+				word = word + "XXX"
+			case "2":
+				word = word + "XX"
+			case "1":
+				word = word + "X"
+			}
+			fmt.Println(word, "Area 3")
+		} else if 1 == len(words)-i {
+			switch string(words[i]) {
+			case "9":
+				word = word + "IX"
+			case "8":
+				word = word + "VIII"
+			case "7":
+				word = word + "VII"
+			case "6":
+				word = word + "VI"
+			case "5":
+				word = word + "V"
+			case "4":
+				word = word + "IV"
+			case "3":
+				word = word + "III"
+			case "2":
+				word = word + "II"
+			case "1":
+				word = word + "I"
+			}
+			fmt.Println(word, "Area 4")
+		}
+		fmt.Println(word, "masuk sini ")
+	}
+	return word
 }
 
 // IsPalindromeNumber mengecek apakah bilangan integer adalah palindrome.
@@ -38,6 +283,7 @@ func IntToRoman(n int) string {
 //	IsPalindromeNumber(12321) -> true
 func IsPalindromeNumber(n int) bool {
 	// TODO: implementasi di sini
+
 	return false
 }
 
@@ -77,7 +323,21 @@ func BaseToDecimal(s string, base int) (int, bool) {
 //	PrimeFactors(100) -> []int{2, 2, 5, 5}
 func PrimeFactors(n int) []int {
 	// TODO: implementasi di sini
-	return nil
+	var hasilBagi int = n
+	// var sisaBagi int = n
+
+	var result []int
+	for i := 2; i <= hasilBagi; {
+		if hasilBagi%i == 0 {
+			hasilBagi = hasilBagi / i
+			result = append(result, i)
+			fmt.Println(i, hasilBagi)
+			i = 2
+		} else {
+			i++
+		}
+	}
+	return result
 }
 
 // IsArmstrong mengecek apakah bilangan merupakan Armstrong number (Narcissistic number).
@@ -92,6 +352,26 @@ func PrimeFactors(n int) []int {
 // Hint: gunakan math.Pow
 func IsArmstrong(n int) bool {
 	// TODO: implementasi di sini
+	if n == 0 {
+		return true
+	}
+
+	val := strconv.Itoa(n)
+	for val1 := 0; val1 <= 9; val1++ {
+		var count int
+		for _, v2 := range val {
+			val2, _ := strconv.Atoi(string(v2))
+			fmt.Print(val1, val2, int(math.Pow(float64(val1), float64(val2))))
+
+			count += int(math.Pow(float64(val2), float64(val1)))
+		}
+		fmt.Println(count)
+		if count == n {
+			return true
+		}
+		count = 0
+	}
+
 	return false
 }
 
@@ -104,6 +384,13 @@ func IsArmstrong(n int) bool {
 //	NextPrime(2) -> 3
 func NextPrime(n int) int {
 	// TODO: implementasi di sini
+	i := n
+	for true {
+		i++
+		if len(PrimeFactors(i)) == 1 {
+			return i
+		}
+	}
 	return 0
 }
 
@@ -116,7 +403,16 @@ func NextPrime(n int) int {
 //	PrimesBetween(14, 16) -> []int{}
 func PrimesBetween(a, b int) []int {
 	// TODO: implementasi di sini
-	return nil
+	if a > b {
+		return []int{}
+	}
+	var val []int
+	for i := a; i <= b; i++ {
+		if len(PrimeFactors(i)) == 1 {
+			val = append(val, i)
+		}
+	}
+	return val
 }
 
 // DigitalRoot menghitung digital root dari bilangan non-negatif.
@@ -128,5 +424,17 @@ func PrimesBetween(a, b int) []int {
 //	DigitalRoot(5) -> 5
 func DigitalRoot(n int) int {
 	// TODO: implementasi di sini
-	return 0
+
+	word := strconv.Itoa(n)
+
+	for len(word) != 1 {
+		count := 0
+		for _, v := range word {
+			num, _ := strconv.Atoi(string(v))
+			count += num
+		}
+		word = strconv.Itoa(count)
+	}
+	num, _ := strconv.Atoi(string(word))
+	return num
 }
