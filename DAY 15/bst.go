@@ -19,8 +19,8 @@ type BST struct {
 // NewBST membuat BST baru yang kosong.
 // Contoh: tree := NewBST() -> BST kosong
 func NewBST() *BST {
-	// TODO: implementasi di sini
-	return nil
+	bst := &BST{}
+	return bst
 }
 
 // Insert menambahkan nilai ke BST.
@@ -40,6 +40,24 @@ func NewBST() *BST {
 //	tree.Insert(5) // diabaikan, sudah ada
 func (b *BST) Insert(val int) {
 	// TODO: implementasi di sini
+	if b.Root == nil {
+		b.Root = &BSTNode{Value: val}
+		return
+	}
+
+	if val < b.Root.Value {
+		if b.Root.Left == nil {
+			b.Root.Left = &BSTNode{Value: val}
+		} else {
+			b.Insert(val)
+		}
+	} else {
+		if b.Root.Right == nil {
+			b.Root.Right = &BSTNode{Value: val}
+		} else {
+			b.Insert(val)
+		}
+	}
 }
 
 // Search mengecek apakah nilai ada di dalam BST.
@@ -72,3 +90,5 @@ func (b *BST) InOrder() []int {
 	// TODO: implementasi di sini
 	return nil
 }
+
+// aku sama sekali tidak paham konsep ini dikarena baru pertama kali mendapatkan test seperti ini dan konsep ini

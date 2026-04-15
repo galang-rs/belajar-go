@@ -20,7 +20,11 @@ package belajar
 // Hint: deklarasikan variabel di dalam MakeCounter, lalu return fungsi yang mengakses variabel itu.
 func MakeCounter() func() int {
 	// TODO: implementasi di sini
-	return nil
+	count := 0
+	return func() int {
+		count++
+		return count
+	}
 }
 
 // MakeMultiplier membuat closure yang mengalikan input dengan factor tertentu.
@@ -35,5 +39,9 @@ func MakeCounter() func() int {
 //	triple(0) -> 0
 func MakeMultiplier(factor int) func(int) int {
 	// TODO: implementasi di sini
-	return nil
+	count := factor
+	return func(val int) int {
+		count = count * val
+		return count
+	}
 }

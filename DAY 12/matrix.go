@@ -25,7 +25,25 @@ package belajar
 // Hint: baris ke-i kolom ke-j di matrix asli menjadi baris ke-j kolom ke-i di matrix hasil.
 func TransposeMatrix(matrix [][]int) [][]int {
 	// TODO: implementasi di sini
-	return nil
+	if len(matrix) == 0 {
+		return [][]int{}
+	}
+
+	rows := len(matrix)
+	cols := len(matrix[0])
+
+	result := make([][]int, cols)
+	for i := 0; i < cols; i++ {
+		result[i] = make([]int, rows)
+	}
+
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			result[j][i] = matrix[i][j]
+		}
+	}
+
+	return result
 }
 
 // RotateMatrix90 memutar matrix persegi 90 derajat searah jarum jam (clockwise).
@@ -51,5 +69,29 @@ func TransposeMatrix(matrix [][]int) [][]int {
 // Hint: result[j][n-1-i] = matrix[i][j], atau transpose lalu reverse setiap baris.
 func RotateMatrix90(matrix [][]int) [][]int {
 	// TODO: implementasi di sini
-	return nil
+	if len(matrix) == 0 {
+		return [][]int{}
+	}
+
+	rows := len(matrix)
+	cols := len(matrix[0])
+
+	result := make([][]int, cols)
+	for i := 0; i < cols; i++ {
+		result[i] = make([]int, rows)
+	}
+
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			result[j][i] = matrix[i][j]
+		}
+	}
+
+	for i := 0; i < len(result); i++ {
+		for l, r := 0, len(result[i])-1; l < r; l, r = l+1, r-1 {
+			result[i][l], result[i][r] = result[i][r], result[i][l]
+		}
+	}
+
+	return result
 }

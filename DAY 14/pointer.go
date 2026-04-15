@@ -19,6 +19,8 @@ package belajar
 // Hint: gunakan variabel sementara (temp) untuk menyimpan salah satu nilai.
 func SwapValues(a, b *int) {
 	// TODO: implementasi di sini
+	*a, *b = *b, *a
+
 }
 
 // DeepCopyMatrix membuat salinan (deep copy) dari matrix 2D.
@@ -36,5 +38,15 @@ func SwapValues(a, b *int) {
 // Hint: gunakan make() dan copy() untuk setiap baris.
 func DeepCopyMatrix(matrix [][]int) [][]int {
 	// TODO: implementasi di sini
-	return nil
+	if len(matrix) == 0 {
+		return nil
+	}
+
+	val := make([][]int, len(matrix))
+	for j, v := range matrix {
+		val1 := make([]int, len(v))
+		copy(val1, v)
+		val[j] = val1
+	}
+	return val
 }

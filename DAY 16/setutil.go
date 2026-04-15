@@ -14,7 +14,21 @@ package belajar
 //	Union([]int{}, []int{}) -> []int{}
 func Union(a, b []int) []int {
 	// TODO: implementasi di sini
-	return nil
+	var data []int
+	seen := make(map[int]bool)
+	for _, v := range a {
+		if !seen[v] {
+			data = append(data, v)
+			seen[v] = true
+		}
+	}
+	for _, v := range b {
+		if !seen[v] {
+			data = append(data, v)
+			seen[v] = true
+		}
+	}
+	return data
 }
 
 // SymmetricDifference mengembalikan elemen yang ada di salah satu slice tapi TIDAK di keduanya.
@@ -30,5 +44,38 @@ func Union(a, b []int) []int {
 // Hint: elemen yang hanya ada di a + elemen yang hanya ada di b.
 func SymmetricDifference(a, b []int) []int {
 	// TODO: implementasi di sini
-	return nil
+	count := make(map[int]int)
+
+	for _, v := range a {
+		count[v]++
+	}
+	for _, v := range b {
+		count[v]++
+	}
+
+	var result []int
+	for k, v := range count {
+		if v == 1 { // hanya muncul di salah satu
+			result = append(result, k)
+		} else {
+			seenA := 0
+			seenB := 0
+			for _, v1 := range a {
+				if k == v1 {
+					seenA++
+				}
+			}
+			for _, v1 := range b {
+				if k == v1 {
+					seenB++
+				}
+			}
+			if seenB == 0 || seenA == 0 {
+				result = append(result, k)
+			}
+		}
+	}
+
+	return result
+
 }
