@@ -1,5 +1,10 @@
 package belajar
 
+import (
+	"fmt"
+	"strings"
+)
+
 // ==================== DAY 17: ENCODING & PARSING ====================
 // Topik: Parsing dan formatting data teks (CSV-like).
 // Konsep penting: memecah string menjadi data terstruktur dan sebaliknya.
@@ -22,8 +27,28 @@ package belajar
 //
 // Hint: gunakan strings.Split dan strings.TrimSpace
 func ParseCSV(input string) [][]string {
+
+	if len(input) == 0 {
+		return [][]string{}
+	}
 	// TODO: implementasi di sini
-	return nil
+	var data [][]string
+
+	trim := strings.Replace(input, "\n\n", "\n", -1)
+	trim = strings.Replace(input, "\n\n", "\n", -1)
+	val := strings.Split(trim, "\n")
+
+	for _, v := range val {
+		va := strings.Split(v, ",")
+		var dat []string
+		for _, v := range va {
+			vat := strings.TrimSpace(v)
+			dat = append(dat, vat)
+		}
+		data = append(data, dat)
+	}
+
+	return data
 }
 
 // ToCSV mengonversi slice 2D string menjadi string CSV.
@@ -41,5 +66,19 @@ func ParseCSV(input string) [][]string {
 //	ToCSV(nil) -> ""
 func ToCSV(data [][]string) string {
 	// TODO: implementasi di sini
-	return ""
+
+	var datas string
+	for k1, v1 := range data {
+		for k2, v2 := range v1 {
+			datas += v2
+			if k2 != len(v1)-1 {
+				datas += ","
+			}
+		}
+		if k1 != len(data)-1 {
+			datas += "\n"
+		}
+	}
+	fmt.Println(datas)
+	return datas
 }
