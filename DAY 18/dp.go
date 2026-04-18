@@ -19,7 +19,35 @@ package belajar
 // dp[0] = 0, dp[i] = min(dp[i-coin] + 1) untuk setiap coin.
 func CoinChange(coins []int, amount int) int {
 	// TODO: implementasi di sini
-	return -1
+	if amount == 0 {
+		return 0
+	}
+	if len(coins) == 0 {
+		return -1
+	}
+
+	max := amount + 1
+	dp := make(map[int]int)
+
+	for i := 0; i <= amount; i++ {
+		dp[i] = max
+	}
+	dp[0] = 0
+
+	for i := 1; i <= amount; i++ {
+		for _, v := range coins {
+			if i-v >= 0 {
+				if dp[i-v]+1 < dp[i] {
+					dp[i] = dp[i-v] + 1
+				}
+			}
+		}
+	}
+
+	if dp[amount] == max {
+		return -1
+	}
+	return dp[amount]
 }
 
 // LongestIncreasingSubsequence mengembalikan panjang subsequence (tidak harus berurutan)
@@ -39,5 +67,31 @@ func CoinChange(coins []int, amount int) int {
 // dp[i] = max(dp[j] + 1) untuk semua j < i dimana nums[j] < nums[i].
 func LongestIncreasingSubsequence(nums []int) int {
 	// TODO: implementasi di sini
-	return 0
+	n := len(nums)
+
+	if n == 0 {
+		return 0
+	}
+
+	dp := make([]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = 1
+	}
+
+	for i := 0; i < n; i++ {
+		for j := 0; j < i; j++ {
+			if nums[j] < nums[i] {
+				if dp[j]+1 > dp[i] {
+					dp[i] = dp[j] + 1
+				}
+			}
+		}
+	}
+	result := 0
+	for i := 0; i < n; i++ {
+		if dp[i] > result {
+			result = dp[i]
+		}
+	}
+	return result
 }
