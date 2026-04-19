@@ -13,7 +13,9 @@ type Graph struct {
 // Contoh: g := NewGraph() -> graph kosong
 func NewGraph() *Graph {
 	// TODO: implementasi di sini
-	return nil
+	return &Graph{
+		adjacency: make(map[int][]int),
+	}
 }
 
 // AddEdge menambahkan edge dari node src ke node dst (directed).
@@ -27,6 +29,7 @@ func NewGraph() *Graph {
 //	// Graph: 1 -> [2, 3], 2 -> [4]
 func (g *Graph) AddEdge(src, dst int) {
 	// TODO: implementasi di sini
+	g.adjacency[src] = append(g.adjacency[src], dst)
 }
 
 // BFS melakukan Breadth-First Search dari node start.
@@ -44,7 +47,32 @@ func (g *Graph) AddEdge(src, dst int) {
 // Hint: gunakan Queue (slice sebagai queue). Tandai node yang sudah dikunjungi.
 func (g *Graph) BFS(start int) []int {
 	// TODO: implementasi di sini
-	return nil
+	if len(g.adjacency) == 0 {
+		return []int{}
+	}
+	q := []int{start}
+	if g.adjacency[start] == nil {
+		return []int{}
+	}
+	visited := map[int]bool{start: true}
+	result := []int{} // ← ini untuk hasil
+
+	for len(q) > 0 {
+		// dequeue
+		current := q[0]
+		q = q[1:]
+
+		// simpan ke hasil
+		result = append(result, current)
+
+		for _, neighbor := range g.adjacency[current] {
+			if !visited[neighbor] {
+				visited[neighbor] = true
+				q = append(q, neighbor)
+			}
+		}
+	}
+	return result
 }
 
 // DFS melakukan Depth-First Search dari node start.

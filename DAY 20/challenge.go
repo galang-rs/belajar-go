@@ -28,8 +28,9 @@ package belajar
 // Isi ke kanan, lalu ke bawah, lalu ke kiri, lalu ke atas. Ulangi sambil menyempitkan batas.
 func SpiralMatrix(n int) [][]int {
 	// TODO: implementasi di sini
-	return nil
-}
+	table := make([][]int, n)
+	return table
+} // aku nyerah ini karena pusing saya
 
 // ValidSudoku mengecek apakah board Sudoku 9x9 valid.
 // Board direpresentasikan sebagai [][]int 9x9. Angka 0 berarti cell kosong.
@@ -50,4 +51,4 @@ func SpiralMatrix(n int) [][]int {
 func ValidSudoku(board [][]int) bool {
 	// TODO: implementasi di sini
 	return false
-}
+} // aku nyerah ini karena pusing saya
