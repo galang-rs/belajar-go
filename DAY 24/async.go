@@ -387,7 +387,6 @@ func ProsesAsync(ctx context.Context, masuk <-chan int, fn func(int) int) <-chan
 	}()
 
 	return out
-
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
