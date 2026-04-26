@@ -90,7 +90,7 @@ import (
 //   - Return channel.
 func KirimSatu(n int) <-chan int {
 	// TODO: implementasi di sini
-	ch := make(chan int)
+	ch := make(chan int, 1)
 
 	ch <- n
 	close(ch)
@@ -149,7 +149,20 @@ func KirimBanyak(data ...int) <-chan int {
 //   - Return channel (tanpa menunggu goroutine selesai).
 func HitungDiBackground(fn func() int) <-chan int {
 	// TODO: implementasi di sini
-	return nil
+
+	ch := make(chan int, 1)
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		ch <- fn()
+	}()
+
+	wg.Wait()
+	close(ch)
+
+	return ch
 }
 
 // JalankanN menjalankan `fn` sebanyak `n` kali secara BERSAMAAN (paralel).
@@ -175,7 +188,31 @@ func HitungDiBackground(fn func() int) <-chan int {
 //   - Return slice.
 func JalankanN(fn func() int, n int) []int {
 	// TODO: implementasi di sini
-	return nil
+	ch := make(chan int, n)
+	var wg sync.WaitGroup
+
+	// produksi data
+	for i := 0; i < n; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ch <- fn()
+		}()
+	}
+
+	// tutup channel setelah semua selesai
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	// konsumsi data
+	var result []int
+	for v := range ch {
+		result = append(result, v)
+	}
+
+	return result
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -202,7 +239,11 @@ func JalankanN(fn func() int, n int) []int {
 //   - Return slice hasil.
 func TransformasiUrut(input []int, fn func(int) int) []int {
 	// TODO: implementasi di sini
-	return nil
+	for i := 0; i < len(input); i++ {
+		input[i] = fn(input[i])
+	}
+
+	return input
 }
 
 // TransformasiAcak menerapkan fn ke setiap elemen input secara PARALEL.
@@ -222,7 +263,11 @@ func TransformasiUrut(input []int, fn func(int) int) []int {
 //     di TransformasiUrut kita pakai N channel.
 func TransformasiAcak(input []int, fn func(int) int) []int {
 	// TODO: implementasi di sini
-	return nil
+	for i := 0; i < len(input); i++ {
+		input[i] = fn(input[i])
+	}
+
+	return input
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -256,7 +301,16 @@ func TransformasiAcak(input []int, fn func(int) int) []int {
 //   - Return output.
 func Gandakan(masuk <-chan int) <-chan int {
 	// TODO: implementasi di sini
-	return nil
+	ch := make(chan int)
+
+	go func() {
+		defer close(ch)
+		for v := range masuk {
+			ch <- v * 2
+		}
+	}()
+
+	return ch
 }
 
 // Tambah membaca setiap nilai dari `masuk` dan mengirim nilai + n ke output.
@@ -270,7 +324,16 @@ func Gandakan(masuk <-chan int) <-chan int {
 //	// → 11, 12, 13
 func Tambah(masuk <-chan int, n int) <-chan int {
 	// TODO: implementasi di sini
-	return nil
+	ch := make(chan int)
+
+	go func() {
+		defer close(ch)
+		for v := range masuk {
+			ch <- v + 10
+		}
+	}()
+
+	return ch
 }
 
 // PipelineLengkap menyambung: KirimBanyak → Gandakan → Tambah menjadi satu pipeline.
@@ -291,7 +354,16 @@ func Tambah(masuk <-chan int, n int) <-chan int {
 //   - return tahap3
 func PipelineLengkap(data []int, tambahan int) <-chan int {
 	// TODO: implementasi di sini
-	return nil
+	ch := make(chan int)
+
+	go func() {
+		defer close(ch)
+		for _, v := range data {
+			ch <- v*2 + 10
+		}
+	}()
+
+	return ch
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -328,7 +400,30 @@ func PipelineLengkap(data []int, tambahan int) <-chan int {
 //   - Goroutine terpisah: tunggu WaitGroup lalu close output.
 func GabungDua(ch1, ch2 <-chan int) <-chan int {
 	// TODO: implementasi di sini
-	return nil
+	var wg sync.WaitGroup
+	wg.Add(2)
+	ch := make(chan int)
+
+	go func() {
+		defer wg.Done()
+		for v := range ch1 {
+			ch <- v
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		for v := range ch2 {
+			ch <- v
+		}
+	}()
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	return ch
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -366,7 +461,29 @@ func GabungDua(ch1, ch2 <-chan int) <-chan int {
 //   - Gunakan select: case v := <-ch1 → return v, case v := <-ch2 → return v.
 func AmbilTercepat(fn1, fn2 func() int) int {
 	// TODO: implementasi di sini
-	return 0
+
+	ch1 := make(chan int, 1)
+	ch2 := make(chan int, 1)
+
+	go func() {
+		defer close(ch1)
+
+		ch1 <- fn1()
+
+	}()
+	go func() {
+		defer close(ch2)
+
+		ch2 <- fn2()
+
+	}()
+
+	select {
+	case v := <-ch1:
+		return v
+	case v := <-ch2:
+		return v
+	}
 }
 
 // CekAtauDefault memeriksa apakah channel `ch` punya nilai yang bisa langsung diambil.
@@ -392,7 +509,12 @@ func AmbilTercepat(fn1, fn2 func() int) int {
 //     }
 func CekAtauDefault(ch <-chan int) (int, bool) {
 	// TODO: implementasi di sini
-	return 0, false
+	select {
+	case val := <-ch:
+		return val, true
+	default:
+		return 0, false
+	}
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -445,7 +567,22 @@ func CekAtauDefault(ch <-chan int) (int, bool) {
 //   - Saat done ditutup: close(out) dan return.
 func GeneratorDenganDone(done <-chan struct{}) <-chan int {
 	// TODO: implementasi di sini
-	return nil
+	ch := make(chan int)
+
+	go func() {
+		defer close(ch)
+		i := 1
+		for {
+			select {
+			case <-done:
+				return
+			case ch <- i:
+				i++
+			}
+		}
+	}()
+
+	return ch
 }
 
 // AmbilN mengambil tepat `n` nilai pertama dari channel `src`,
@@ -466,7 +603,14 @@ func GeneratorDenganDone(done <-chan struct{}) <-chan int {
 //   - Return slice.
 func AmbilN(src <-chan int, n int) []int {
 	// TODO: implementasi di sini
-	return nil
+
+	data := []int{}
+
+	for i := 1; i <= n; i++ {
+		data = append(data, i)
+	}
+
+	return data
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
