@@ -387,8 +387,27 @@ func GenUlangi(v, n int) <-chan int {
 //   - Setelah src habis, close semua channel.
 //   - Return sebagai []<-chan int.
 func SebarKe(src <-chan int, n int) []<-chan int {
-	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	channels := make([]chan int, n)
+	for i := range channels {
+		channels[i] = make(chan int, 1)
+	}
+
+	go func() {
+		i := 0
+		for v := range src {
+			channels[i%n] <- v
+			i++
+		}
+		for _, ch := range channels {
+			close(ch)
+		}
+	}()
+
+	out := make([]<-chan int, n)
+	for i, ch := range channels {
+		out[i] = ch
+	}
+	return out
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -419,8 +438,26 @@ func SebarKe(src <-chan int, n int) []<-chan int {
 //   - Untuk tiap channel, goroutine drain isinya ke output, lalu Done().
 //   - Goroutine terpisah: tunggu WaitGroup lalu close output.
 func GabungSemua(channels ...<-chan int) <-chan int {
-	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	out := make(chan int)
+	var wg sync.WaitGroup
+	wg.Add(len(channels))
+
+	for _, ch := range channels {
+		ch := ch
+		go func() {
+			defer wg.Done()
+			for v := range ch {
+				out <- v
+			}
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	return out
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -449,8 +486,25 @@ func GabungSemua(channels ...<-chan int) <-chan int {
 //     case <-timer → close(out), return
 //     case v, ok := <-src → if !ok { close(out); return }; out <- v
 func DenganTimeout(src <-chan int, dur time.Duration) <-chan int {
-	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	out := make(chan int)
+	timer := time.After(dur)
+
+	go func() {
+		defer close(out)
+		for {
+			select {
+			case <-timer:
+				return
+			case v, ok := <-src:
+				if !ok {
+					return
+				}
+				out <- v
+			}
+		}
+	}()
+
+	return out
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -483,8 +537,24 @@ func DenganTimeout(src <-chan int, dur time.Duration) <-chan int {
 //   - Kalau slice tidak kosong, kirim ke out.
 //   - Kalau src tutup dan slice kosong, close(out) dan return.
 func Batch(src <-chan int, size int) <-chan []int {
-	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	out := make(chan []int)
+
+	go func() {
+		defer close(out)
+		var buf []int
+		for v := range src {
+			buf = append(buf, v)
+			if len(buf) == size {
+				out <- buf
+				buf = nil
+			}
+		}
+		if len(buf) > 0 {
+			out <- buf
+		}
+	}()
+
+	return out
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -517,8 +587,24 @@ func Batch(src <-chan int, size int) <-chan []int {
 //   - Jika salah satu ok==false, close(out) dan return.
 //   - Kirim [2]int{va, vb} ke out.
 func Zip(a, b <-chan int) <-chan [2]int {
-	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	out := make(chan [2]int)
+
+	go func() {
+		defer close(out)
+		for {
+			va, ok := <-a
+			if !ok {
+				return
+			}
+			vb, ok := <-b
+			if !ok {
+				return
+			}
+			out <- [2]int{va, vb}
+		}
+	}()
+
+	return out
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -550,8 +636,9 @@ func Zip(a, b <-chan int) <-chan [2]int {
 //   - Atau kreatif: pakai Kali dua kali tidak bisa karena src sudah habis.
 //     Gunakan TransformasiChan dengan fn = func(n int) int { return n*n }.
 func HitungGenapKuadrat(dari, sampai int) <-chan int {
-	// TODO: implementasi di sini (butuh TransformasiChan di bawah)
-	panic("belum diimplementasi")
+	src := GenRange(dari, sampai)
+	genap := Filter(src, func(n int) bool { return n%2 == 0 })
+	return TransformasiChan(genap, func(n int) int { return n * n })
 }
 
 // TransformasiChan menerapkan fn ke setiap nilai dari src dan mengirim hasilnya.
@@ -564,8 +651,16 @@ func HitungGenapKuadrat(dari, sampai int) <-chan int {
 //	kuadrat := TransformasiChan(src, func(n int) int { return n * n })
 //	for v := range kuadrat { fmt.Println(v) } // → 1, 4, 9, 16, 25
 func TransformasiChan(src <-chan int, fn func(int) int) <-chan int {
-	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	out := make(chan int)
+
+	go func() {
+		defer close(out)
+		for v := range src {
+			out <- fn(v)
+		}
+	}()
+
+	return out
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
