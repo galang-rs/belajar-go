@@ -87,7 +87,7 @@ import (
 //	Kuadrat(-3) // 9
 func Kuadrat(n int) int {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	return n * n
 }
 
 // Abs mengembalikan nilai absolut dari n.
@@ -99,7 +99,7 @@ func Kuadrat(n int) int {
 //	Abs(0)  // 0
 func Abs(n int) int {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	return int(math.Abs(float64(n)))
 }
 
 // Maks mengembalikan nilai terbesar dari slice.
@@ -111,7 +111,17 @@ func Abs(n int) int {
 //	Maks([]int{})               // 0, error
 func Maks(nums []int) (int, error) {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if len(nums) == 0 {
+		return 0, fmt.Errorf("error")
+	}
+	val := math.Inf(-1)
+	for _, v := range nums {
+		if float64(v) > val {
+			val = float64(v)
+		}
+	}
+	v := int(val)
+	return v, nil
 }
 
 // Min mengembalikan nilai terkecil dari slice.
@@ -123,7 +133,17 @@ func Maks(nums []int) (int, error) {
 //	Min([]int{})               // 0, error
 func Min(nums []int) (int, error) {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if len(nums) == 0 {
+		return 0, fmt.Errorf("error")
+	}
+	val := math.Inf(1)
+	for _, v := range nums {
+		if float64(v) < val {
+			val = float64(v)
+		}
+	}
+	v := int(val)
+	return v, nil
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -150,7 +170,14 @@ func Min(nums []int) (int, error) {
 //	BalikString("a")      // "a"
 func BalikString(s string) string {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	runes := []rune(s)
+	n := len(runes)
+
+	for i := 0; i < n/2; i++ {
+		runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
+	}
+
+	return string(runes)
 }
 
 // HitungKata mengembalikan jumlah kata dalam string.
@@ -163,7 +190,14 @@ func BalikString(s string) string {
 //	HitungKata("")                // 0
 func HitungKata(s string) int {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	s = strings.ReplaceAll(s, "  ", " ")
+	s = strings.TrimSpace(s)
+	val := strings.Split(s, " ")
+	if val[0] == "" {
+		return 0
+	}
+
+	return len(val)
 }
 
 // Palindrom mengembalikan true jika s adalah palindrom (dibaca sama dari dua arah).
@@ -177,7 +211,14 @@ func HitungKata(s string) int {
 //	Palindrom("Go")            // false
 func Palindrom(s string) bool {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ToLower(s)
+	for k, v := range s {
+		if v != rune(s[len(s)-1-k]) {
+			return false
+		}
+	}
+	return true
 }
 
 // KapitalisasiKata mengubah huruf pertama setiap kata menjadi kapital.
@@ -189,7 +230,7 @@ func Palindrom(s string) bool {
 //	KapitalisasiKata("")            // ""
 func KapitalisasiKata(s string) string {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	return s
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -232,7 +273,13 @@ type Keranjang struct {
 //	err  = k.Tambah(Produk{"Roti", -100})  // error: harga negatif
 func (k *Keranjang) Tambah(p Produk) error {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if p.Nama == "" {
+		return fmt.Errorf("nama kosong")
+	} else if p.Harga < 0 {
+		return fmt.Errorf("harga negatif")
+	}
+	k.items = append(k.items, p)
+	return nil
 }
 
 // Hapus menghapus produk pertama dengan nama yang cocok.
@@ -245,7 +292,20 @@ func (k *Keranjang) Tambah(p Produk) error {
 //	err  = k.Hapus("Mangga") // error: tidak ditemukan
 func (k *Keranjang) Hapus(nama string) error {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	arr := []Produk{}
+	found := false
+	for _, v := range k.items {
+		if v.Nama != nama {
+			arr = append(arr, v)
+		} else {
+			found = true
+		}
+	}
+	if !found {
+		return ErrTidakDitemukan
+	}
+	k.items = arr
+	return nil
 }
 
 // TotalHarga menghitung total harga semua produk di keranjang.
@@ -257,13 +317,17 @@ func (k *Keranjang) Hapus(nama string) error {
 //	k.TotalHarga() // 8000
 func (k *Keranjang) TotalHarga() float64 {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	var count float64
+	for _, v := range k.items {
+		count += v.Harga
+	}
+	return count
 }
 
 // Jumlah mengembalikan jumlah produk di keranjang.
 func (k *Keranjang) Jumlah() int {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	return len(k.items)
 }
 
 // DaftarNama mengembalikan slice nama semua produk (terurut alfabet).
@@ -275,7 +339,13 @@ func (k *Keranjang) Jumlah() int {
 //	k.DaftarNama() // ["Apel", "Roti"]
 func (k *Keranjang) DaftarNama() []string {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	arr := []string{}
+
+	for _, v := range k.items {
+		arr = append(arr, v.Nama)
+	}
+
+	return arr
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -329,7 +399,14 @@ type MockPenyimpan struct {
 // Hint: inisialisasi m.data jika nil, lalu simpan ke map.
 func (m *MockPenyimpan) Simpan(id string, data string) error {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if m.data == nil {
+		m.data = make(map[string]string)
+	}
+	if m.data[id] != "" {
+		return fmt.Errorf("id ada")
+	}
+	m.data[id] = data
+	return nil
 }
 
 // Ambil mengambil data berdasarkan id.
@@ -338,20 +415,32 @@ func (m *MockPenyimpan) Simpan(id string, data string) error {
 // Hint: cek apakah key ada di map.
 func (m *MockPenyimpan) Ambil(id string) (string, error) {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if m.data[id] == "" {
+		return "", ErrTidakDitemukan
+	}
+
+	return m.data[id], nil
 }
 
 // Hapus menghapus data berdasarkan id.
 // Mengembalikan error jika id tidak ditemukan.
 func (m *MockPenyimpan) Hapus(id string) error {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if m.data[id] == "" {
+		return ErrTidakDitemukan
+	}
+
+	delete(m.data, id)
+	return nil
 }
 
 // Ada mengembalikan true jika id ada di penyimpanan.
 func (m *MockPenyimpan) Ada(id string) bool {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if m.data[id] == "" {
+		return false
+	}
+	return true
 }
 
 // LayananPengguna adalah service yang bergantung pada PenyimpanData.
@@ -377,7 +466,13 @@ func BuatLayananPengguna(p PenyimpanData) *LayananPengguna {
 //	err  = l.Daftar("u2", "")        // error: nama kosong
 func (l *LayananPengguna) Daftar(id, nama string) error {
 	// TODO: implementasi di sini
-	panic("belum diimplementasi")
+	if l.penyimpan.Ada(id) {
+		return fmt.Errorf("id sudah ada")
+	} else if nama == "" {
+		return fmt.Errorf("nama kosong")
+	}
+
+	return nil
 }
 
 // AmbilNama mengambil nama pengguna berdasarkan id.
